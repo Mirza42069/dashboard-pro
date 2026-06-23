@@ -1,18 +1,17 @@
-import { Geist, Geist_Mono, Roboto_Slab } from "next/font/google"
+import { Courier_Prime, Plus_Jakarta_Sans } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
-const robotoSlab = Roboto_Slab({subsets:['latin'],variable:'--font-serif'});
-
-const fontSans = Geist({
+const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
 })
 
-const fontMono = Geist_Mono({
+const fontMono = Courier_Prime({
   subsets: ["latin"],
+  weight: ["400", "700"],
   variable: "--font-mono",
 })
 
@@ -25,7 +24,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontSans.variable, fontMono.variable, "font-serif", robotoSlab.variable)}
+      className={cn("antialiased", fontSans.variable, fontMono.variable)}
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>
