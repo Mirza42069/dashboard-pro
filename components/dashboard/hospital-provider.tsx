@@ -5,10 +5,12 @@ import { toast } from "sonner"
 
 import {
   initialAppointments,
+  initialTasks,
   patients as initialPatients,
   staff as initialStaff,
   type Appointment,
   type AppointmentStatus,
+  type CareTask,
   type DutyStatus,
   type Patient,
 } from "@/lib/hospital-data"
@@ -24,6 +26,8 @@ interface HospitalState {
   setAppointmentStatus: (id: string, status: AppointmentStatus) => void
   staff: typeof initialStaff
   setDutyStatus: (id: string, status: DutyStatus) => void
+  tasks: CareTask[]
+  toggleTask: (id: string) => void
   starred: boolean
   toggleStarred: () => void
 }
@@ -40,6 +44,7 @@ export function HospitalProvider({ children }: { children: React.ReactNode }) {
   const [patients, setPatients] = React.useState(initialPatients)
   const [appointments, setAppointments] = React.useState(initialAppointments)
   const [staff, setStaff] = React.useState(initialStaff)
+  const [tasks, setTasks] = React.useState(initialTasks)
   const [starred, setStarred] = React.useState(false)
 
   const value: HospitalState = {
@@ -50,10 +55,14 @@ export function HospitalProvider({ children }: { children: React.ReactNode }) {
     },
     dischargePatients: (ids) => {
       setPatients((prev) =>
-        prev.map((p) => (ids.includes(p.id) ? { ...p, status: "Discharged" } : p))
+        prev.map((p) =>
+          ids.includes(p.id) ? { ...p, status: "Discharged" } : p
+        )
       )
       toast.success(
-        ids.length === 1 ? `${ids[0]} discharged` : `${ids.length} patients discharged`
+        ids.length === 1
+          ? `${ids[0]} discharged`
+          : `${ids.length} patients discharged`
       )
     },
     readmitPatient: (id) => {
@@ -76,7 +85,9 @@ export function HospitalProvider({ children }: { children: React.ReactNode }) {
       toast.success(`Appointment booked for ${appointment.patient}`)
     },
     setAppointmentStatus: (id, status) => {
-      setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)))
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status } : a))
+      )
       toast.success(`Appointment ${status.toLowerCase()}`)
     },
     staff,
@@ -85,6 +96,18 @@ export function HospitalProvider({ children }: { children: React.ReactNode }) {
       const member = staff.find((s) => s.id === id)
       toast.success(`${member?.name ?? id} is now ${status.toLowerCase()}`)
     },
+    tasks,
+    toggleTask: (id) => {
+      const task = tasks.find((t) => t.id === id)
+      setTasks((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
+      )
+      if (task) {
+        toast.success(
+          task.done ? `Reopened: ${task.title}` : `Completed: ${task.title}`
+        )
+      }
+    },
     starred,
     toggleStarred: () => {
       toast.success(starred ? "Removed from favorites" : "Added to favorites")
@@ -92,5 +115,9 @@ export function HospitalProvider({ children }: { children: React.ReactNode }) {
     },
   }
 
-  return <HospitalContext.Provider value={value}>{children}</HospitalContext.Provider>
+  return (
+    <HospitalContext.Provider value={value}>
+      {children}
+    </HospitalContext.Provider>
+  )
 }

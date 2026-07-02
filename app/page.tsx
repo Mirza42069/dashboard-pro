@@ -1,26 +1,24 @@
 import type { Metadata } from "next"
-import { Suspense } from "react"
 
+import { CommandCenterView } from "@/components/dashboard/command-center-view"
 import { PageHeader } from "@/components/dashboard/page-header"
-import { PatientsView } from "@/components/dashboard/patients-view"
 
 export const metadata: Metadata = {
-  title: "Patient Management System",
+  title: "Command Center — Mercy General",
   description:
-    "Patient tracking across all wards — admissions, diagnoses, attending staff, and discharge",
+    "Live shift overview — census, beds, schedule, and hospital activity",
 }
 
 export default function Page() {
   return (
     <>
       <PageHeader
-        title="Patient Management System"
-        subtitle="Patient tracking across all wards — admissions, diagnoses, attending staff, and discharge"
+        eyebrow="Mercy General — Day shift 07:00–19:00"
+        title="Command Center"
+        subtitle="Shift overview for Thursday, Jul 2 — census, beds, schedule, and activity across the hospital"
       />
-      <div className="mt-[46px]">
-        <Suspense>
-          <PatientsView />
-        </Suspense>
+      <div className="mt-6">
+        <CommandCenterView />
       </div>
     </>
   )

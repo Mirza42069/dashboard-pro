@@ -5,7 +5,8 @@ import { WardsView } from "@/components/dashboard/wards-view"
 
 export const metadata: Metadata = {
   title: "Ward Occupancy",
-  description: "Live bed capacity, occupancy, and head-nurse assignments per ward",
+  description:
+    "Live bed capacity, occupancy, and head-nurse assignments per ward",
 }
 
 export default function WardsPage() {
@@ -15,7 +16,7 @@ export default function WardsPage() {
         title="Ward Occupancy"
         subtitle="Live bed capacity across every ward — occupancy, availability, and nursing assignments"
       />
-      <div className="mt-[46px]">
+      <div className="mt-6">
         <WardsView />
       </div>
     </>

@@ -1,19 +1,21 @@
 "use client"
 
 import * as React from "react"
+import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Building03Icon,
   Clock01Icon,
   HashtagIcon,
   HeartPulseIcon,
+  InsertColumnRightIcon,
   MoreVerticalIcon,
   Search01Icon,
   StethoscopeIcon,
   UserIcon,
 } from "@hugeicons/core-free-icons"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,9 +38,9 @@ import { wardDot, type DutyStatus } from "@/lib/hospital-data"
 import { useHospital } from "./hospital-provider"
 
 const dutyStyles: Record<DutyStatus, string> = {
-  "On duty": "bg-[#05a400]/10 text-[#009638]",
-  "On call": "bg-[#b38625]/10 text-[#b38625]",
-  "Off duty": "bg-[#878787]/10 text-[#808080]",
+  "On duty": "bg-[#05a400]/15 text-[#009638]",
+  "On call": "bg-[#b38625]/15 text-[#b38625]",
+  "Off duty": "bg-[#878787]/15 text-[#808080]",
 }
 
 const dutyDot: Record<DutyStatus, string> = {
@@ -47,8 +49,10 @@ const dutyDot: Record<DutyStatus, string> = {
   "Off duty": "#9a9a9a",
 }
 
-const headCell = "h-9 border-r-[0.5px] border-[#e8e8e8] bg-[#fbfbfb] px-3 last:border-r-0"
-const bodyCell = "h-10 border-r-[0.5px] border-[#e8e8e8] px-3 py-0 last:border-r-0"
+const headCell =
+  "h-9 border-r-[0.5px] border-[#e8e8e8] bg-[#f7f7f9] px-3 last:border-r-0"
+const bodyCell =
+  "h-10 border-r-[0.5px] border-[#e8e8e8] px-3 py-0 last:border-r-0"
 
 export function StaffView() {
   const { staff, setDutyStatus } = useHospital()
@@ -66,13 +70,13 @@ export function StaffView() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border-[0.5px] border-[#e8e8e8] px-2.5 py-[5px] text-xs leading-none font-semibold text-[#222]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-[5px] border-[0.5px] border-[#e8e8e8] px-2.5 py-[5px] text-xs leading-none font-semibold text-[#222]">
             <span className="size-[7px] rounded-[2px] bg-[#05a400]" />
             {onDuty} on duty
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border-[0.5px] border-[#e8e8e8] px-2.5 py-[5px] text-xs leading-none font-semibold text-[#222]">
+          <span className="inline-flex items-center gap-1.5 rounded-[5px] border-[0.5px] border-[#e8e8e8] px-2.5 py-[5px] text-xs leading-none font-semibold text-[#222]">
             <span className="size-[7px] rounded-[2px] bg-[#d19d2c]" />
             {onCall} on call
           </span>
@@ -86,65 +90,129 @@ export function StaffView() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search staff, ward, pager..."
+            placeholder="Search staff, ward, pager…"
             aria-label="Search staff"
-            className="h-[27px] w-[220px] rounded-[8px] border-[#e8e8e8] pl-8 text-xs placeholder:text-[#808080]"
+            className="h-[27px] w-full rounded-[6px] border-[#e8e8e8] pl-8 text-xs placeholder:text-[#808080] sm:w-[220px]"
           />
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-t-[12px] border border-b-0 border-[#e8e8e8]">
-        <Table>
+      <div className="overflow-x-auto rounded-t-[8px] border border-b-0 border-[#e5e5e9] bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]">
+        <Table className="min-w-[900px]">
           <TableHeader>
             <TableRow className="border-b-[0.5px] border-[#e8e8e8] hover:bg-transparent">
               <TableHead className={cn(headCell, "w-[220px]")}>
                 <span className="flex items-center gap-1.5">
-                  <HugeiconsIcon icon={UserIcon} className="size-3.5 text-[#808080]" strokeWidth={1.8} />
-                  <span className="text-xs leading-none font-semibold text-black">Staff member</span>
+                  <HugeiconsIcon
+                    icon={UserIcon}
+                    className="size-3.5 text-[#808080]"
+                    strokeWidth={1.8}
+                  />
+                  <span className="text-xs leading-none font-semibold text-black">
+                    Staff member
+                  </span>
                 </span>
               </TableHead>
               <TableHead className={cn(headCell, "w-[130px]")}>
                 <span className="flex items-center gap-1.5">
-                  <HugeiconsIcon icon={StethoscopeIcon} className="size-3.5 text-[#808080]" strokeWidth={1.8} />
-                  <span className="text-xs leading-none font-semibold text-black">Role</span>
+                  <HugeiconsIcon
+                    icon={StethoscopeIcon}
+                    className="size-3.5 text-[#808080]"
+                    strokeWidth={1.8}
+                  />
+                  <span className="text-xs leading-none font-semibold text-black">
+                    Role
+                  </span>
                 </span>
               </TableHead>
               <TableHead className={cn(headCell, "w-[150px]")}>
                 <span className="flex items-center gap-1.5">
-                  <HugeiconsIcon icon={Building03Icon} className="size-3.5 text-[#808080]" strokeWidth={1.8} />
-                  <span className="text-xs leading-none font-semibold text-black">Ward</span>
+                  <HugeiconsIcon
+                    icon={Building03Icon}
+                    className="size-3.5 text-[#808080]"
+                    strokeWidth={1.8}
+                  />
+                  <span className="text-xs leading-none font-semibold text-black">
+                    Ward
+                  </span>
                 </span>
               </TableHead>
               <TableHead className={cn(headCell, "w-[150px]")}>
                 <span className="flex items-center gap-1.5">
-                  <HugeiconsIcon icon={Clock01Icon} className="size-3.5 text-[#808080]" strokeWidth={1.8} />
-                  <span className="text-xs leading-none font-semibold text-black">Shift</span>
+                  <HugeiconsIcon
+                    icon={Clock01Icon}
+                    className="size-3.5 text-[#808080]"
+                    strokeWidth={1.8}
+                  />
+                  <span className="text-xs leading-none font-semibold text-black">
+                    Shift
+                  </span>
                 </span>
               </TableHead>
               <TableHead className={cn(headCell, "w-[90px]")}>
                 <span className="flex items-center gap-1.5">
-                  <HugeiconsIcon icon={HashtagIcon} className="size-3.5 text-[#808080]" strokeWidth={1.8} />
-                  <span className="text-xs leading-none font-semibold text-black">Pager</span>
+                  <HugeiconsIcon
+                    icon={HashtagIcon}
+                    className="size-3.5 text-[#808080]"
+                    strokeWidth={1.8}
+                  />
+                  <span className="text-xs leading-none font-semibold text-black">
+                    Pager
+                  </span>
                 </span>
               </TableHead>
               <TableHead className={cn(headCell, "w-[140px]")}>
                 <span className="flex items-center gap-1.5">
-                  <HugeiconsIcon icon={HeartPulseIcon} className="size-3.5 text-[#808080]" strokeWidth={1.8} />
-                  <span className="text-xs leading-none font-semibold text-black">Duty status</span>
+                  <HugeiconsIcon
+                    icon={HeartPulseIcon}
+                    className="size-3.5 text-[#808080]"
+                    strokeWidth={1.8}
+                  />
+                  <span className="text-xs leading-none font-semibold text-black">
+                    Duty status
+                  </span>
                 </span>
               </TableHead>
-              <TableHead className={cn(headCell, "w-[50px]")} />
+              <TableHead className={cn(headCell, "w-[60px]")}>
+                <span className="flex items-center justify-end gap-1.5 text-[#808080]">
+                  <button
+                    type="button"
+                    aria-label="Add column"
+                    onClick={() => toast.info("Custom columns coming soon")}
+                    className="transition-colors hover:text-black"
+                  >
+                    <HugeiconsIcon
+                      icon={InsertColumnRightIcon}
+                      className="size-4"
+                      strokeWidth={1.8}
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Table options"
+                    onClick={() => toast.info("Table options coming soon")}
+                    className="transition-colors hover:text-black"
+                  >
+                    <HugeiconsIcon
+                      icon={MoreVerticalIcon}
+                      className="size-4"
+                      strokeWidth={1.8}
+                    />
+                  </button>
+                </span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows.map((member) => (
               <TableRow
                 key={member.id}
-                className="group/row border-b-[0.5px] border-[#e8e8e8] hover:bg-[#fbfbfb]"
+                className="group/row border-b-[0.5px] border-[#e8e8e8] hover:bg-[#f7f7f9]"
               >
                 <TableCell className={bodyCell}>
                   <span className="flex items-center gap-2.5">
-                    <Avatar className="size-[26px] after:hidden">
+                    <Avatar className="size-[26px] after:border-black/5">
+                      <AvatarImage src={member.photo} alt={member.name} />
                       <AvatarFallback
                         className="text-[10px] font-semibold"
                         style={{ backgroundColor: member.bg, color: member.fg }}
@@ -163,27 +231,35 @@ export function StaffView() {
                   </span>
                 </TableCell>
                 <TableCell className={bodyCell}>
-                  <span className="text-xs leading-none font-medium text-[#222]">{member.role}</span>
+                  <span className="text-xs leading-none font-medium text-[#222]">
+                    {member.role}
+                  </span>
                 </TableCell>
                 <TableCell className={bodyCell}>
-                  <span className="inline-flex items-center gap-1 rounded-[14px] border-[0.5px] border-[#e8e8e8] px-2.5 py-[5px]">
+                  <span className="inline-flex items-center gap-1 rounded-[5px] border-[0.5px] border-[#e8e8e8] px-2.5 py-[5px]">
                     <span
                       className="size-[7px] rounded-[2px]"
                       style={{ backgroundColor: wardDot[member.ward] }}
                     />
-                    <span className="text-xs leading-none font-semibold text-[#222]">{member.ward}</span>
+                    <span className="text-xs leading-none font-semibold text-[#222]">
+                      {member.ward}
+                    </span>
                   </span>
                 </TableCell>
                 <TableCell className={bodyCell}>
-                  <span className="font-mono text-sm leading-none text-[#222]">{member.shift}</span>
+                  <span className="text-xs font-medium leading-none text-[#222]">
+                    {member.shift}
+                  </span>
                 </TableCell>
                 <TableCell className={bodyCell}>
-                  <span className="font-mono text-sm leading-none text-[#222]">{member.pager}</span>
+                  <span className="text-xs font-medium leading-none text-[#222]">
+                    {member.pager}
+                  </span>
                 </TableCell>
                 <TableCell className={bodyCell}>
                   <span
                     className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full px-2 py-[5px] text-xs leading-none font-semibold",
+                      "inline-flex items-center gap-1.5 rounded-[5px] px-2 py-[5px] text-xs leading-none font-semibold",
                       dutyStyles[member.status]
                     )}
                   >
@@ -203,20 +279,45 @@ export function StaffView() {
                           aria-label={`Set duty status for ${member.name}`}
                           className="text-[#808080] opacity-0 transition-opacity group-hover/row:opacity-100 hover:text-black data-[state=open]:opacity-100"
                         >
-                          <HugeiconsIcon icon={MoreVerticalIcon} className="size-4" strokeWidth={1.8} />
+                          <HugeiconsIcon
+                            icon={MoreVerticalIcon}
+                            className="size-4"
+                            strokeWidth={1.8}
+                          />
                         </button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" sideOffset={4} className="w-36 rounded-[10px] border-[#e8e8e8]">
+                      <DropdownMenuContent
+                        align="end"
+                        sideOffset={4}
+                        className="w-36 rounded-[7px] border-[#e8e8e8]"
+                      >
                         <DropdownMenuLabel className="text-[10px] font-semibold text-[#808080]">
                           Duty status
                         </DropdownMenuLabel>
                         <DropdownMenuRadioGroup
                           value={member.status}
-                          onValueChange={(v) => setDutyStatus(member.id, v as DutyStatus)}
+                          onValueChange={(v) =>
+                            setDutyStatus(member.id, v as DutyStatus)
+                          }
                         >
-                          <DropdownMenuRadioItem value="On duty" className="text-xs">On duty</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="On call" className="text-xs">On call</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="Off duty" className="text-xs">Off duty</DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="On duty"
+                            className="text-xs"
+                          >
+                            On duty
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="On call"
+                            className="text-xs"
+                          >
+                            On call
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="Off duty"
+                            className="text-xs"
+                          >
+                            Off duty
+                          </DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -226,7 +327,10 @@ export function StaffView() {
             ))}
             {rows.length === 0 && (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={7} className="h-24 text-center text-xs font-medium text-[#808080]">
+                <TableCell
+                  colSpan={7}
+                  className="h-24 text-center text-xs font-medium text-[#808080]"
+                >
                   No staff match your search.
                 </TableCell>
               </TableRow>

@@ -17,7 +17,7 @@ import {
 /** Bordered chip with a 7px color dot — Figma department chip */
 export function WardChip({ ward }: { ward: Ward }) {
   return (
-    <span className="inline-flex items-center justify-center gap-1 rounded-[14px] border-[0.5px] border-[#e8e8e8] px-2.5 py-[5px]">
+    <span className="inline-flex items-center justify-center gap-1 rounded-[5px] border-[0.5px] border-[#e8e8e8] px-2.5 py-[5px]">
       <span
         className="size-[7px] rounded-[2px]"
         style={{ backgroundColor: wardDot[ward] }}
@@ -35,10 +35,10 @@ export function StatusPill({ status }: { status: PatientStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center gap-1 rounded-full px-2 py-[5px]",
+        "inline-flex items-center justify-center gap-1 rounded-[5px] px-2 py-[5px]",
         admitted
-          ? "bg-[#05a400]/10 text-[#009638]"
-          : "bg-[#a40000]/10 text-[#960000]"
+          ? "bg-[#05a400]/15 text-[#009638]"
+          : "bg-[#a40000]/15 text-[#960000]"
       )}
     >
       <HugeiconsIcon
@@ -51,28 +51,32 @@ export function StatusPill({ status }: { status: PatientStatus }) {
   )
 }
 
-const conditionIcon: Record<Condition, { color: string; critical?: boolean }> =
-  {
-    Stable: { color: "#05a400" },
-    Fair: { color: "#d19d2c" },
-    Serious: { color: "#f86300" },
-    Critical: { color: "#e01e1e", critical: true },
-  }
+const conditionStyles: Record<
+  Condition,
+  { chip: string; critical?: boolean }
+> = {
+  Stable: { chip: "bg-[#05a400]/15 text-[#008a00]" },
+  Fair: { chip: "bg-[#d19d2c]/15 text-[#9c721a]" },
+  Serious: { chip: "bg-[#f86300]/15 text-[#d55500]" },
+  Critical: { chip: "bg-[#e01e1e]/15 text-[#c81414]", critical: true },
+}
 
-/** Bordered chip with tinted severity icon — Figma severity chip */
+/** Tinted severity chip — color-coded so acuity reads at a glance */
 export function ConditionChip({ condition }: { condition: Condition }) {
-  const { color, critical } = conditionIcon[condition]
+  const { chip, critical } = conditionStyles[condition]
   return (
-    <span className="inline-flex items-center justify-center gap-1 rounded-[14px] border-[0.5px] border-[#e8e8e8] px-2.5 py-1">
+    <span
+      className={cn(
+        "inline-flex items-center justify-center gap-1 rounded-[5px] px-2.5 py-1",
+        chip
+      )}
+    >
       <HugeiconsIcon
         icon={critical ? Alert02Icon : ChartBarBigIcon}
         className="size-3.5"
         strokeWidth={2}
-        style={{ color }}
       />
-      <span className="text-xs leading-none font-semibold text-[#222]">
-        {condition}
-      </span>
+      <span className="text-xs leading-none font-semibold">{condition}</span>
     </span>
   )
 }

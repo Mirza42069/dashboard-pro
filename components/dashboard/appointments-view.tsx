@@ -16,7 +16,17 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Dialog,
   DialogContent,
@@ -59,10 +69,10 @@ const typeIcon: Record<AppointmentType, IconSvgElement> = {
 }
 
 const statusStyles: Record<AppointmentStatus, string> = {
-  Confirmed: "bg-[#0052a4]/10 text-[#0360be]",
-  Pending: "bg-[#b38625]/10 text-[#b38625]",
-  Completed: "bg-[#05a400]/10 text-[#009638]",
-  Cancelled: "bg-[#878787]/10 text-[#808080]",
+  Confirmed: "bg-[#0052a4]/15 text-[#0360be]",
+  Pending: "bg-[#b38625]/15 text-[#b38625]",
+  Completed: "bg-[#05a400]/15 text-[#009638]",
+  Cancelled: "bg-[#878787]/15 text-[#808080]",
 }
 
 const doctorList = Object.values(doctors)
@@ -76,7 +86,7 @@ const appointmentTypes: AppointmentType[] = [
 
 const fieldLabel = "text-[11px] leading-none font-semibold text-[#222]"
 const fieldInput =
-  "h-8 w-full rounded-[6px] border-[#e8e8e8] text-xs font-medium text-[#222] placeholder:text-[#808080]"
+  "h-8 w-full rounded-[4px] border-[#e8e8e8] text-xs font-medium text-[#222] placeholder:text-[#808080]"
 
 function BookDialog({
   open,
@@ -119,7 +129,7 @@ function BookDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[400px] rounded-[12px] border-[#e8e8e8] p-0">
+      <DialogContent className="max-w-[400px] rounded-[8px] border-[#e8e8e8] p-0">
         <form onSubmit={submit}>
           <DialogHeader className="border-b border-[#e8e8e8] px-4 py-3.5">
             <DialogTitle className="text-sm font-semibold text-black">
@@ -131,7 +141,9 @@ function BookDialog({
           </DialogHeader>
           <div className="grid grid-cols-2 gap-3.5 px-4 py-4">
             <div className="col-span-2 flex flex-col gap-1.5">
-              <Label htmlFor="apt-patient" className={fieldLabel}>Patient name</Label>
+              <Label htmlFor="apt-patient" className={fieldLabel}>
+                Patient name
+              </Label>
               <Input
                 id="apt-patient"
                 required
@@ -142,7 +154,9 @@ function BookDialog({
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="apt-time" className={fieldLabel}>Time</Label>
+              <Label htmlFor="apt-time" className={fieldLabel}>
+                Time
+              </Label>
               <Input
                 id="apt-time"
                 type="time"
@@ -154,13 +168,18 @@ function BookDialog({
             </div>
             <div className="flex flex-col gap-1.5">
               <Label className={fieldLabel}>Type</Label>
-              <Select value={type} onValueChange={(v) => setType(v as AppointmentType)}>
+              <Select
+                value={type}
+                onValueChange={(v) => setType(v as AppointmentType)}
+              >
                 <SelectTrigger size="sm" className={fieldInput}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="rounded-[10px] border-[#e8e8e8]">
+                <SelectContent className="rounded-[7px] border-[#e8e8e8]">
                   {appointmentTypes.map((t) => (
-                    <SelectItem key={t} value={t} className="text-xs">{t}</SelectItem>
+                    <SelectItem key={t} value={t} className="text-xs">
+                      {t}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -171,16 +190,19 @@ function BookDialog({
                 <SelectTrigger size="sm" className={fieldInput}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="rounded-[10px] border-[#e8e8e8]">
+                <SelectContent className="rounded-[7px] border-[#e8e8e8]">
                   {doctorList.map((d) => (
-                    <SelectItem key={d.name} value={d.name} className="text-xs">{d.name}</SelectItem>
+                    <SelectItem key={d.name} value={d.name} className="text-xs">
+                      {d.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="apt-room" className={fieldLabel}>
-                Room <span className="font-medium text-[#808080]">(optional)</span>
+                Room{" "}
+                <span className="font-medium text-[#808080]">(optional)</span>
               </Label>
               <Input
                 id="apt-room"
@@ -191,17 +213,17 @@ function BookDialog({
               />
             </div>
           </div>
-          <DialogFooter className="border-t border-[#e8e8e8] bg-[#fbfbfb] px-4 py-3">
+          <DialogFooter className="border-t border-[#e8e8e8] bg-[#f7f7f9] px-4 py-3">
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="rounded-[6px] border border-[#e8e8e8] bg-white px-2.5 py-1.5 text-[11px] leading-none font-medium text-[#222] transition-colors hover:bg-[#f4f3f3]"
+              className="rounded-[4px] border border-[#e8e8e8] bg-white px-2.5 py-1.5 text-[11px] leading-none font-medium text-[#222] transition-colors hover:bg-[#ececef]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded-[6px] bg-[#222] px-2.5 py-1.5 text-[11px] leading-none font-medium text-[#e8e8e8] transition-colors hover:bg-black"
+              className="rounded-[4px] bg-[#222] px-2.5 py-1.5 text-[11px] leading-none font-medium text-[#e8e8e8] transition-colors hover:bg-black"
             >
               Book appointment
             </button>
@@ -216,6 +238,9 @@ export function AppointmentsView() {
   const { appointments, setAppointmentStatus } = useHospital()
   const [day, setDay] = React.useState(0)
   const [bookOpen, setBookOpen] = React.useState(false)
+  const [pendingCancel, setPendingCancel] = React.useState<Appointment | null>(
+    null
+  )
 
   const dayAppointments = appointments
     .filter((a) => a.day === day)
@@ -223,11 +248,11 @@ export function AppointmentsView() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div
           role="tablist"
           aria-label="Day of week"
-          className="flex h-[27px] items-center gap-[2px] rounded-[8px] bg-[#f4f3f3] py-[2px] pr-[3px] pl-[2px]"
+          className="flex h-[27px] max-w-full items-center gap-[2px] overflow-x-auto rounded-[6px] bg-[#ececef] py-[2px] pr-[3px] pl-[2px]"
         >
           {weekDays.map((label, index) => {
             const count = appointments.filter(
@@ -241,7 +266,7 @@ export function AppointmentsView() {
                 aria-selected={day === index}
                 onClick={() => setDay(index)}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-[6px] px-2.5 py-1 text-xs leading-none font-semibold transition-colors",
+                  "flex items-center gap-1.5 rounded-[4px] px-2.5 py-1 text-xs leading-none font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[#797bff]/50 focus-visible:outline-none",
                   day === index
                     ? "bg-white text-black shadow-[0px_1px_2px_0px_rgba(0,0,0,0.04)]"
                     : "text-[#808080] hover:text-black"
@@ -251,8 +276,10 @@ export function AppointmentsView() {
                 {count > 0 && (
                   <span
                     className={cn(
-                      "rounded-full px-1 py-0.5 font-mono text-[9px] leading-none",
-                      day === index ? "bg-[#f4f3f3] text-[#222]" : "bg-[#e8e8e8] text-[#808080]"
+                      "rounded-[5px] px-1 py-0.5 text-[9px] leading-none",
+                      day === index
+                        ? "bg-[#ececef] text-[#222]"
+                        : "bg-[#e8e8e8] text-[#808080]"
                     )}
                   >
                     {count}
@@ -265,17 +292,25 @@ export function AppointmentsView() {
         <button
           type="button"
           onClick={() => setBookOpen(true)}
-          className="flex items-center gap-1 rounded-[6px] bg-[#222] px-2 py-1 transition-colors hover:bg-black"
+          className="flex items-center gap-1 rounded-[4px] bg-[#222] px-2 py-1 transition-colors hover:bg-black"
         >
-          <span className="text-[11px] leading-none font-medium text-[#e8e8e8]">Book</span>
-          <HugeiconsIcon icon={PlusSignIcon} className="size-3.5 text-[#e8e8e8]" strokeWidth={2} />
+          <span className="text-[11px] leading-none font-medium text-[#e8e8e8]">
+            Book
+          </span>
+          <HugeiconsIcon
+            icon={PlusSignIcon}
+            className="size-3.5 text-[#e8e8e8]"
+            strokeWidth={2}
+          />
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-[12px] border border-[#e8e8e8]">
+      <div className="overflow-hidden rounded-[8px] border border-[#e8e8e8]">
         {dayAppointments.length === 0 && (
           <div className="flex h-40 flex-col items-center justify-center gap-1.5">
-            <p className="text-xs font-semibold text-[#222]">No appointments on {weekDays[day]}</p>
+            <p className="text-xs font-semibold text-[#222]">
+              No appointments on {weekDays[day]}
+            </p>
             <p className="text-[10px] font-medium text-[#808080]">
               Book the first slot with the button above.
             </p>
@@ -287,16 +322,28 @@ export function AppointmentsView() {
             <div
               key={apt.id}
               className={cn(
-                "group/row flex items-center gap-4 px-4 py-2.5 transition-colors hover:bg-[#fbfbfb]",
+                "group/row flex items-center gap-4 px-4 py-2.5 transition-colors hover:bg-[#f7f7f9]",
                 index > 0 && "border-t-[0.5px] border-[#e8e8e8]",
-                cancelled && "bg-[#fbfbfb]"
+                cancelled && "bg-[#f7f7f9]"
               )}
             >
-              <span className={cn("w-[52px] shrink-0 font-mono text-sm leading-none text-[#222]", cancelled && "opacity-50")}>
+              <span
+                className={cn(
+                  "w-[52px] shrink-0 text-xs font-medium leading-none text-[#222]",
+                  cancelled && "opacity-50"
+                )}
+              >
                 {apt.time}
               </span>
-              <span className={cn("flex w-[220px] shrink-0 flex-col gap-1", cancelled && "opacity-50")}>
-                <span className="text-xs leading-none font-semibold text-[#222]">{apt.patient}</span>
+              <span
+                className={cn(
+                  "flex w-[220px] shrink-0 flex-col gap-1",
+                  cancelled && "opacity-50"
+                )}
+              >
+                <span className="text-xs leading-none font-semibold text-[#222]">
+                  {apt.patient}
+                </span>
                 <span className="text-[10px] leading-none font-medium text-[#808080]">
                   {apt.id} · Room {apt.room}
                 </span>
@@ -307,37 +354,68 @@ export function AppointmentsView() {
                   cancelled && "opacity-50"
                 )}
               >
-                <HugeiconsIcon icon={typeIcon[apt.type]} className="size-3.5 text-[#808080]" strokeWidth={2} />
+                <HugeiconsIcon
+                  icon={typeIcon[apt.type]}
+                  className="size-3.5 text-[#808080]"
+                  strokeWidth={2}
+                />
                 {apt.type}
               </span>
-              <span className={cn("flex flex-1 items-center gap-2", cancelled && "opacity-50")}>
-                <Avatar className="size-[22px] after:hidden">
+              <span
+                className={cn(
+                  "flex flex-1 items-center gap-2",
+                  cancelled && "opacity-50"
+                )}
+              >
+                <Avatar className="size-[22px] after:border-black/5">
+                  <AvatarImage src={apt.doctor.photo} alt={apt.doctor.name} />
                   <AvatarFallback
                     className="text-[9px] font-semibold"
-                    style={{ backgroundColor: apt.doctor.bg, color: apt.doctor.fg }}
+                    style={{
+                      backgroundColor: apt.doctor.bg,
+                      color: apt.doctor.fg,
+                    }}
                   >
                     {apt.doctor.initials}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-xs leading-none font-medium text-[#222]">{apt.doctor.name}</span>
+                <span className="text-xs leading-none font-medium text-[#222]">
+                  {apt.doctor.name}
+                </span>
               </span>
               <span
                 className={cn(
-                  "inline-flex items-center gap-1 rounded-full px-2 py-[5px] text-xs leading-none font-semibold",
+                  "inline-flex items-center gap-1 rounded-[5px] px-2 py-[5px] text-xs leading-none font-semibold",
                   statusStyles[apt.status]
                 )}
               >
                 {apt.status === "Completed" && (
-                  <HugeiconsIcon icon={Tick02Icon} className="size-3" strokeWidth={2.5} />
+                  <HugeiconsIcon
+                    icon={Tick02Icon}
+                    className="size-3"
+                    strokeWidth={2.5}
+                  />
                 )}
                 {apt.status === "Cancelled" && (
-                  <HugeiconsIcon icon={Cancel01Icon} className="size-3" strokeWidth={2.5} />
+                  <HugeiconsIcon
+                    icon={Cancel01Icon}
+                    className="size-3"
+                    strokeWidth={2.5}
+                  />
                 )}
                 {apt.status === "Pending" && (
-                  <HugeiconsIcon icon={Clock01Icon} className="size-3" strokeWidth={2.5} />
+                  <HugeiconsIcon
+                    icon={Clock01Icon}
+                    className="size-3"
+                    strokeWidth={2.5}
+                  />
                 )}
                 {apt.status === "Confirmed" && (
-                  <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3" strokeWidth={2.5} />
+                  <HugeiconsIcon
+                    icon={CheckmarkCircle02Icon}
+                    className="size-3"
+                    strokeWidth={2.5}
+                  />
                 )}
                 {apt.status}
               </span>
@@ -348,29 +426,46 @@ export function AppointmentsView() {
                     aria-label={`Actions for ${apt.id}`}
                     className="text-[#808080] opacity-0 transition-opacity group-hover/row:opacity-100 hover:text-black data-[state=open]:opacity-100"
                   >
-                    <HugeiconsIcon icon={MoreVerticalIcon} className="size-4" strokeWidth={1.8} />
+                    <HugeiconsIcon
+                      icon={MoreVerticalIcon}
+                      className="size-4"
+                      strokeWidth={1.8}
+                    />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" sideOffset={4} className="w-36 rounded-[10px] border-[#e8e8e8]">
+                <DropdownMenuContent
+                  align="end"
+                  sideOffset={4}
+                  className="w-36 rounded-[7px] border-[#e8e8e8]"
+                >
                   {apt.status !== "Confirmed" && apt.status !== "Completed" && (
-                    <DropdownMenuItem className="text-xs" onClick={() => setAppointmentStatus(apt.id, "Confirmed")}>
+                    <DropdownMenuItem
+                      className="text-xs"
+                      onClick={() => setAppointmentStatus(apt.id, "Confirmed")}
+                    >
                       Confirm
                     </DropdownMenuItem>
                   )}
                   {apt.status !== "Completed" && apt.status !== "Cancelled" && (
-                    <DropdownMenuItem className="text-xs" onClick={() => setAppointmentStatus(apt.id, "Completed")}>
+                    <DropdownMenuItem
+                      className="text-xs"
+                      onClick={() => setAppointmentStatus(apt.id, "Completed")}
+                    >
                       Mark completed
                     </DropdownMenuItem>
                   )}
                   {apt.status === "Cancelled" ? (
-                    <DropdownMenuItem className="text-xs" onClick={() => setAppointmentStatus(apt.id, "Pending")}>
+                    <DropdownMenuItem
+                      className="text-xs"
+                      onClick={() => setAppointmentStatus(apt.id, "Pending")}
+                    >
                       Restore
                     </DropdownMenuItem>
                   ) : (
                     <DropdownMenuItem
                       variant="destructive"
                       className="text-xs"
-                      onClick={() => setAppointmentStatus(apt.id, "Cancelled")}
+                      onClick={() => setPendingCancel(apt)}
                     >
                       Cancel
                     </DropdownMenuItem>
@@ -383,6 +478,37 @@ export function AppointmentsView() {
       </div>
 
       <BookDialog open={bookOpen} onOpenChange={setBookOpen} day={day} />
+      <AlertDialog
+        open={pendingCancel !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingCancel(null)
+        }}
+      >
+        <AlertDialogContent size="sm" className="rounded-[8px] border-[#e8e8e8]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel appointment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingCancel
+                ? `${pendingCancel.patient} at ${pendingCancel.time} will be marked cancelled. You can restore it from the actions menu.`
+                : "This appointment will be marked cancelled."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep appointment</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                if (pendingCancel) {
+                  setAppointmentStatus(pendingCancel.id, "Cancelled")
+                }
+                setPendingCancel(null)
+              }}
+            >
+              Cancel appointment
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

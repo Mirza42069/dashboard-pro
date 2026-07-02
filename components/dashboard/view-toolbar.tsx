@@ -1,13 +1,13 @@
 "use client"
 
 import * as React from "react"
+import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import type { IconSvgElement } from "@hugeicons/react"
 import {
   ArrowDataTransferHorizontalIcon,
   Cancel01Icon,
   FilterHorizontalIcon,
-  LayoutTable02Icon,
   PlusSignIcon,
   Search01Icon,
   SlidersHorizontalIcon,
@@ -39,20 +39,28 @@ import {
 import { cn } from "@/lib/utils"
 import { wards, type Condition, type Ward } from "@/lib/hospital-data"
 
-export const patientViews = ["All patients", "Admitted", "Discharged", "Critical"] as const
+export const patientViews = [
+  "All patients",
+  "Admitted",
+  "Discharged",
+  "Critical",
+] as const
 export type PatientView = (typeof patientViews)[number]
 
 export type SortField = "id" | "age" | "admitted" | "ward"
-export type RowHeight = "compact" | "default" | "relaxed"
 
 export const columnDefs = [
   { key: "ward", label: "Ward" },
   { key: "attending", label: "Attending" },
+  { key: "diagnosis", label: "Diagnosis" },
   { key: "status", label: "Status" },
   { key: "condition", label: "Condition" },
+  { key: "vitals", label: "Vitals" },
+  { key: "allergies", label: "Allergies" },
+  { key: "tasks", label: "Tasks" },
   { key: "age", label: "Age" },
   { key: "blood", label: "Blood" },
-  { key: "room", label: "Room" },
+  { key: "location", label: "Location" },
   { key: "admitted", label: "Admitted" },
 ] as const
 export type ColumnKey = (typeof columnDefs)[number]["key"]
@@ -64,7 +72,6 @@ export interface TableControls {
   conditionFilter: Condition[]
   sortField: SortField
   sortAsc: boolean
-  rowHeight: RowHeight
   hiddenColumns: ColumnKey[]
 }
 
@@ -75,13 +82,19 @@ export const defaultControls: TableControls = {
   conditionFilter: [],
   sortField: "id",
   sortAsc: true,
-  rowHeight: "default",
-  hiddenColumns: [],
+  // status is conveyed by views + row dimming; identity columns stay lean
+  hiddenColumns: ["status", "age", "blood"],
 }
 
 const conditions: Condition[] = ["Stable", "Fair", "Serious", "Critical"]
 
-const iconButton = "relative transition-colors hover:text-black data-[state=open]:text-black"
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#797bff]/50"
+
+const iconButton = cn(
+  "relative rounded-[4px] transition-colors hover:text-black data-[state=open]:text-black",
+  focusRing
+)
 
 function ToolbarIcon({
   icon,
@@ -133,26 +146,28 @@ export function ViewToolbar({
   }
 
   function toggleInList<T>(list: T[], item: T): T[] {
-    return list.includes(item) ? list.filter((x) => x !== item) : [...list, item]
+    return list.includes(item)
+      ? list.filter((x) => x !== item)
+      : [...list, item]
   }
 
   return (
-    <div className="flex items-end justify-between">
-      <div className="flex items-center gap-1.5">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto">
         <div
-          role="tablist"
+          role="group"
           aria-label="Patient views"
-          className="flex h-[27px] items-center gap-[2px] rounded-[8px] bg-[#f4f3f3] py-[2px] pr-[3px] pl-[2px]"
+          className="flex h-[27px] items-center gap-[2px] rounded-[6px] bg-[#ececef] py-[2px] pr-[3px] pl-[2px]"
         >
           {patientViews.map((v) => (
             <button
               key={v}
               type="button"
-              role="tab"
-              aria-selected={controls.view === v}
+              aria-pressed={controls.view === v}
               onClick={() => set("view", v)}
               className={cn(
-                "flex items-center justify-center rounded-[6px] px-2.5 py-1 text-xs leading-none font-semibold transition-colors",
+                "flex items-center justify-center rounded-[4px] px-2.5 py-1 text-xs leading-none font-semibold transition-colors",
+                focusRing,
                 controls.view === v
                   ? "bg-white text-black shadow-[0px_1px_2px_0px_rgba(0,0,0,0.04)]"
                   : "text-[#808080] hover:text-black"
@@ -162,23 +177,40 @@ export function ViewToolbar({
             </button>
           ))}
         </div>
+        <button
+          type="button"
+          aria-label="Add view"
+          onClick={() => toast.info("Custom views coming soon")}
+          className={cn(
+            "flex size-[23px] items-center justify-center rounded-[6px] bg-[#ececef] text-[#808080] transition-colors hover:text-black",
+            focusRing
+          )}
+        >
+          <HugeiconsIcon
+            icon={PlusSignIcon}
+            className="size-3.5"
+            strokeWidth={2}
+          />
+        </button>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:justify-end sm:gap-4">
         <TooltipProvider>
           <div className="flex items-center gap-3.5">
             {/* Sort */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <span className="relative inline-flex">
-                  <ToolbarIcon
-                    icon={ArrowDataTransferHorizontalIcon}
-                    label="Sort"
-                    active={controls.sortField !== "id" || !controls.sortAsc}
-                  />
-                </span>
+                <ToolbarIcon
+                  icon={ArrowDataTransferHorizontalIcon}
+                  label="Sort"
+                  active={controls.sortField !== "id" || !controls.sortAsc}
+                />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={8} className="w-44 rounded-[10px] border-[#e8e8e8]">
+              <DropdownMenuContent
+                align="end"
+                sideOffset={8}
+                className="w-44 rounded-[7px] border-[#e8e8e8]"
+              >
                 <DropdownMenuLabel className="text-[10px] font-semibold text-[#808080]">
                   Sort by
                 </DropdownMenuLabel>
@@ -186,18 +218,30 @@ export function ViewToolbar({
                   value={controls.sortField}
                   onValueChange={(v) => set("sortField", v as SortField)}
                 >
-                  <DropdownMenuRadioItem value="id" className="text-xs">Patient ID</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="age" className="text-xs">Age</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="admitted" className="text-xs">Admission date</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="ward" className="text-xs">Ward</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="id" className="text-xs">
+                    Patient ID
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="age" className="text-xs">
+                    Age
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="admitted" className="text-xs">
+                    Admission date
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="ward" className="text-xs">
+                    Ward
+                  </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup
                   value={controls.sortAsc ? "asc" : "desc"}
                   onValueChange={(v) => set("sortAsc", v === "asc")}
                 >
-                  <DropdownMenuRadioItem value="asc" className="text-xs">Ascending</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="desc" className="text-xs">Descending</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="asc" className="text-xs">
+                    Ascending
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="desc" className="text-xs">
+                    Descending
+                  </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -205,18 +249,30 @@ export function ViewToolbar({
             {/* Filter */}
             <Popover>
               <PopoverTrigger asChild>
-                <span className="relative inline-flex">
-                  <ToolbarIcon icon={FilterHorizontalIcon} label="Filter" active={filtersActive} />
-                </span>
+                <ToolbarIcon
+                  icon={FilterHorizontalIcon}
+                  label="Filter"
+                  active={filtersActive}
+                />
               </PopoverTrigger>
-              <PopoverContent align="end" sideOffset={8} className="w-[280px] rounded-[12px] border-[#e8e8e8] p-0">
+              <PopoverContent
+                align="end"
+                sideOffset={8}
+                className="w-[280px] rounded-[8px] border-[#e8e8e8] p-0"
+              >
                 <div className="flex items-center justify-between border-b border-[#e8e8e8] px-3 py-2.5">
-                  <span className="text-xs font-semibold text-black">Filters</span>
+                  <span className="text-xs font-semibold text-black">
+                    Filters
+                  </span>
                   {filtersActive && (
                     <button
                       type="button"
                       onClick={() =>
-                        onChange({ ...controls, wardFilter: [], conditionFilter: [] })
+                        onChange({
+                          ...controls,
+                          wardFilter: [],
+                          conditionFilter: [],
+                        })
                       }
                       className="text-[10px] font-semibold text-[#808080] transition-colors hover:text-black"
                     >
@@ -225,62 +281,59 @@ export function ViewToolbar({
                   )}
                 </div>
                 <div className="flex flex-col gap-2.5 p-3">
-                  <p className="text-[10px] leading-none font-semibold text-[#808080]">Ward</p>
+                  <p className="text-[10px] leading-none font-semibold text-[#808080]">
+                    Ward
+                  </p>
                   <div className="grid grid-cols-2 gap-2">
                     {wards.map((w) => (
-                      <label key={w.name} className="flex cursor-pointer items-center gap-2">
+                      <label
+                        key={w.name}
+                        className="flex cursor-pointer items-center gap-2"
+                      >
                         <Checkbox
                           checked={controls.wardFilter.includes(w.name)}
                           onCheckedChange={() =>
-                            set("wardFilter", toggleInList(controls.wardFilter, w.name))
+                            set(
+                              "wardFilter",
+                              toggleInList(controls.wardFilter, w.name)
+                            )
                           }
                           className="border-[#e8e8e8] bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]"
                         />
-                        <span className="text-xs leading-none font-medium text-[#222]">{w.name}</span>
+                        <span className="text-xs leading-none font-medium text-[#222]">
+                          {w.name}
+                        </span>
                       </label>
                     ))}
                   </div>
-                  <p className="mt-1 text-[10px] leading-none font-semibold text-[#808080]">Condition</p>
+                  <p className="mt-1 text-[10px] leading-none font-semibold text-[#808080]">
+                    Condition
+                  </p>
                   <div className="grid grid-cols-2 gap-2">
                     {conditions.map((c) => (
-                      <label key={c} className="flex cursor-pointer items-center gap-2">
+                      <label
+                        key={c}
+                        className="flex cursor-pointer items-center gap-2"
+                      >
                         <Checkbox
                           checked={controls.conditionFilter.includes(c)}
                           onCheckedChange={() =>
-                            set("conditionFilter", toggleInList(controls.conditionFilter, c))
+                            set(
+                              "conditionFilter",
+                              toggleInList(controls.conditionFilter, c)
+                            )
                           }
                           className="border-[#e8e8e8] bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]"
                         />
-                        <span className="text-xs leading-none font-medium text-[#222]">{c}</span>
+                        <span className="text-xs leading-none font-medium text-[#222]">
+                          {c}
+                        </span>
                       </label>
                     ))}
                   </div>
                 </div>
               </PopoverContent>
             </Popover>
-
-            {/* Row height */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <span className="relative inline-flex">
-                  <ToolbarIcon
-                    icon={LayoutTable02Icon}
-                    label="Row height"
-                    active={controls.rowHeight !== "default"}
-                  />
-                </span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={8} className="w-36 rounded-[10px] border-[#e8e8e8]">
-                <DropdownMenuRadioGroup
-                  value={controls.rowHeight}
-                  onValueChange={(v) => set("rowHeight", v as RowHeight)}
-                >
-                  <DropdownMenuRadioItem value="compact" className="text-xs">Compact</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="default" className="text-xs">Default</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="relaxed" className="text-xs">Relaxed</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
 
             {/* Search */}
             <div className="flex items-center">
@@ -300,7 +353,7 @@ export function ViewToolbar({
               />
               <div
                 className={cn(
-                  "overflow-hidden transition-all duration-200",
+                  "overflow-hidden transition-[width,margin,opacity] duration-200 motion-reduce:transition-none",
                   searchOpen ? "ml-2 w-[180px] opacity-100" : "w-0 opacity-0"
                 )}
               >
@@ -314,8 +367,9 @@ export function ViewToolbar({
                       setSearchOpen(false)
                     }
                   }}
-                  placeholder="ID, doctor, room..."
-                  className="h-7 rounded-[6px] border-[#e8e8e8] text-xs placeholder:text-[#808080]"
+                  aria-label="Search patients"
+                  placeholder="Name, MRN, diagnosis…"
+                  className="h-7 rounded-[4px] border-[#e8e8e8] text-xs placeholder:text-[#808080]"
                 />
               </div>
             </div>
@@ -323,15 +377,17 @@ export function ViewToolbar({
             {/* Column visibility */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <span className="relative inline-flex">
-                  <ToolbarIcon
-                    icon={SlidersHorizontalIcon}
-                    label="Columns"
-                    active={controls.hiddenColumns.length > 0}
-                  />
-                </span>
+                <ToolbarIcon
+                  icon={SlidersHorizontalIcon}
+                  label="Columns"
+                  active={controls.hiddenColumns.length > 0}
+                />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={8} className="w-44 rounded-[10px] border-[#e8e8e8]">
+              <DropdownMenuContent
+                align="end"
+                sideOffset={8}
+                className="w-44 rounded-[7px] border-[#e8e8e8]"
+              >
                 <DropdownMenuLabel className="text-[10px] font-semibold text-[#808080]">
                   Show columns
                 </DropdownMenuLabel>
@@ -360,10 +416,19 @@ export function ViewToolbar({
         <button
           type="button"
           onClick={onAdd}
-          className="flex items-center gap-1 rounded-[6px] bg-[#222] px-2 py-1 transition-colors hover:bg-black"
+          className={cn(
+            "flex items-center gap-1 rounded-[4px] bg-[#222] px-2 py-1 transition-colors hover:bg-black",
+            focusRing
+          )}
         >
-          <span className="text-[11px] leading-none font-medium text-[#e8e8e8]">Add</span>
-          <HugeiconsIcon icon={PlusSignIcon} className="size-3.5 text-[#e8e8e8]" strokeWidth={2} />
+          <span className="text-[11px] leading-none font-medium text-[#e8e8e8]">
+            Add
+          </span>
+          <HugeiconsIcon
+            icon={PlusSignIcon}
+            className="size-3.5 text-[#e8e8e8]"
+            strokeWidth={2}
+          />
         </button>
       </div>
     </div>
