@@ -1,11 +1,27 @@
+import type { Metadata } from "next"
+import { Suspense } from "react"
+
+import { PageHeader } from "@/components/dashboard/page-header"
+import { PatientsView } from "@/components/dashboard/patients-view"
+
+export const metadata: Metadata = {
+  title: "Patient Management System",
+  description:
+    "Patient tracking across all wards — admissions, diagnoses, attending staff, and discharge",
+}
+
 export default function Page() {
   return (
-    <main className="min-h-svh bg-white text-black">
-      <div className="mx-auto flex min-h-svh max-w-[1440px] items-center justify-center px-6">
-        <p className="text-sm font-medium text-[#808080]">
-          Dashboard removed. Ready to rebuild Employment Table.
-        </p>
+    <>
+      <PageHeader
+        title="Patient Management System"
+        subtitle="Patient tracking across all wards — admissions, diagnoses, attending staff, and discharge"
+      />
+      <div className="mt-[46px]">
+        <Suspense>
+          <PatientsView />
+        </Suspense>
       </div>
-    </main>
+    </>
   )
 }
